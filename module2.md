@@ -143,3 +143,23 @@ AWS strives to make security as familiar as traditional security while adding cl
    Attack types and mitigation:
    - **UDP reflection attacks**: the attacker asks a target for information using a forged source address.
    - **SYN flood (DDoS)**: makes a server unavailable by consuming all its resources; automatic scaling helps absorb larger volumes of attacks.
+
+## Shared Responsibility Model
+
+AWS is responsible for the security **of** the cloud: the foundation services and the global infrastructure listed below.
+
+1. **AWS foundation services**
+   Compute, storage, database, and networking.
+   - **Compute**: Amazon EC2, Amazon ECS, AWS Lambda, etc.
+   - **Storage**: Amazon S3.
+   - **Database**: Amazon RDS.
+   - **Networking**: Amazon VPC, Elastic Load Balancing.
+
+2. **AWS global infrastructure**
+   Data centers, Availability Zones, Regions, and edge locations.
+   - **Data center**: a physical facility that hosts servers, networking equipment, and storage systems.
+   - **Availability Zone (AZ)**: one or more data centers.
+   - **Region**: a physical location in the world where AWS has multiple Availability Zones (for example, us-east-1, us-east-2, ap-south-1, ap-southeast-2).
+   - **Edge location**: part of the AWS content delivery network, delivering content and applications with low latency and high performance.
+
+## Shared respondibility example
