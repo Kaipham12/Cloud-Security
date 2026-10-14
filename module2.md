@@ -200,18 +200,18 @@ A centralized team responsible for establishing repeatable processes and templat
 
 ### Typical activities
 
-| Activity | What the MSO does |
-| --- | --- |
-| **Account provisioning** | Establishes initial accounts with basic security in place. |
-| **Security oversight** | Monitors deployments and implements auditor groups. |
-| **Amazon VPC configuration** | Manages VPCs, subnets, security groups, and network ACLs. |
-| **IAM configuration** | Creates user groups and assigns permissions. |
-| **Template development** | Creates preapproved AWS CloudFormation templates. |
-| **AMI creation** | Maintains a library of common, approved AMIs. |
-| **Shared services VPC** | Provides centralized monitoring and logging. |
+| Activity                     | What the MSO does                                          |
+| ---------------------------- | ---------------------------------------------------------- |
+| **Account provisioning**     | Establishes initial accounts with basic security in place. |
+| **Security oversight**       | Monitors deployments and implements auditor groups.        |
+| **Amazon VPC configuration** | Manages VPCs, subnets, security groups, and network ACLs.  |
+| **IAM configuration**        | Creates user groups and assigns permissions.               |
+| **Template development**     | Creates preapproved AWS CloudFormation templates.          |
+| **AMI creation**             | Maintains a library of common, approved AMIs.              |
+| **Shared services VPC**      | Provides centralized monitoring and logging.               |
 
 ### Resulting responsibility split
 
-- **AWS**: security *of* the cloud (infrastructure and foundation services).
+- **AWS**: security _of_ the cloud (infrastructure and foundation services).
 - **MSO**: the secure, approved baseline (accounts, network, IAM, templates, AMIs, logging).
 - **Workload owner**: the application, its data, and its use of the MSO-provided baseline.
