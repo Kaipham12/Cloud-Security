@@ -162,4 +162,56 @@ AWS is responsible for the security **of** the cloud: the foundation services an
    - **Region**: a physical location in the world where AWS has multiple Availability Zones (for example, us-east-1, us-east-2, ap-south-1, ap-southeast-2).
    - **Edge location**: part of the AWS content delivery network, delivering content and applications with low latency and high performance.
 
-## Shared respondibility example
+## Shared Responsibility Example
+
+Scenario: a MySQL database runs on Amazon RDS, with application servers on Amazon EC2 and files stored in Amazon S3, all deployed in a VPC.
+
+| Service                           | AWS is responsible for (security **of** the cloud)                                                | Customer is responsible for (security **in** the cloud)                                                                         |
+| --------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon S3** (storage)           | Durability and availability of the service, physical hardware, and the underlying infrastructure. | Bucket policies and access control, encryption of data, versioning, and what data is stored.                                    |
+| **Amazon EC2** (compute, IaaS)    | Physical hosts, hypervisor, and the global infrastructure.                                        | Guest OS patching and hardening, installed applications, security groups, and IAM roles for instances.                          |
+| **Amazon RDS** (managed database) | Physical infrastructure, host OS and database engine patching, and the managed backup mechanism.  | Database users and permissions, encryption settings, security groups and network placement in the VPC, and data classification. |
+| **Amazon VPC** (networking)       | Underlying network infrastructure and the isolation capability.                                   | Subnet design, route tables, network ACLs, security groups, and VPN or Direct Connect configuration.                            |
+
+Key idea: the more managed the service (RDS, S3 vs. EC2), the more AWS handles; the customer always remains responsible for their data and access management.
+
+## Security in the Cloud
+
+The customer's responsibility depends on the AWS services they choose. Before architecting any workload, decide:
+
+- **What content** to store on AWS.
+- **Which AWS services** will be used with that content.
+- **Where** (in which country or Region) the content is stored.
+- **Format and structure** of the content, and whether it is masked, anonymized, or encrypted.
+- **Who has access** to the content, and how those access rights are granted, managed, and revoked.
+
+## Managed Services Organization (MSO) Responsibility Model
+
+### What is an MSO?
+
+A centralized team responsible for establishing repeatable processes and templates for AWS deployments while maintaining organizational control. An MSO can be internal, or external (a third-party vendor or managed service provider, MSP).
+
+### Benefits
+
+- Ensures applications are deployed securely and in compliance with requirements.
+- Automates the implementation of organizational security requirements.
+- Workload owners inherit a significant share of security control implementation.
+- Reduces the scope of authorization documentation for workload owners.
+
+### Typical activities
+
+| Activity | What the MSO does |
+| --- | --- |
+| **Account provisioning** | Establishes initial accounts with basic security in place. |
+| **Security oversight** | Monitors deployments and implements auditor groups. |
+| **Amazon VPC configuration** | Manages VPCs, subnets, security groups, and network ACLs. |
+| **IAM configuration** | Creates user groups and assigns permissions. |
+| **Template development** | Creates preapproved AWS CloudFormation templates. |
+| **AMI creation** | Maintains a library of common, approved AMIs. |
+| **Shared services VPC** | Provides centralized monitoring and logging. |
+
+### Resulting responsibility split
+
+- **AWS**: security *of* the cloud (infrastructure and foundation services).
+- **MSO**: the secure, approved baseline (accounts, network, IAM, templates, AMIs, logging).
+- **Workload owner**: the application, its data, and its use of the MSO-provided baseline.
