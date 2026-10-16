@@ -104,21 +104,21 @@ Grant users only the **minimum permissions** needed to perform their job.
 
 There are six types of policies:
 
-| #   | Policy type                                | Description                                                                                                                                  |
-| --- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Identity-based policies**                | Attached to IAM identities (users, groups, roles) and grant permissions to that identity.                                                    |
-| 2   | **Resource-based policies**                | Attached to resources and grant permissions to the principal specified in the policy.                                                        |
-| 3   | **Permissions boundaries**                 | Define the **maximum** permissions that identity-based policies can grant to an entity. They do **not** grant permissions on their own.      |
-| 4   | **AWS Organizations SCPs**                 | Service control policies define the **maximum** permissions for member accounts of an organization or organizational unit (OU).              |
-| 5   | **Access control lists (ACLs)**            | Control which principals in other accounts can access the resource to which the ACL is attached.                                             |
-| 6   | **Session policies**                       | Used with the AWS CLI or AWS API to create a temporary session for a role or federated user.                                                 |
+| #   | Policy type                     | Description                                                                                                                             |
+| --- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Identity-based policies**     | Attached to IAM identities (users, groups, roles) and grant permissions to that identity.                                               |
+| 2   | **Resource-based policies**     | Attached to resources and grant permissions to the principal specified in the policy.                                                   |
+| 3   | **Permissions boundaries**      | Define the **maximum** permissions that identity-based policies can grant to an entity. They do **not** grant permissions on their own. |
+| 4   | **AWS Organizations SCPs**      | Service control policies define the **maximum** permissions for member accounts of an organization or organizational unit (OU).         |
+| 5   | **Access control lists (ACLs)** | Control which principals in other accounts can access the resource to which the ACL is attached.                                        |
+| 6   | **Session policies**            | Used with the AWS CLI or AWS API to create a temporary session for a role or federated user.                                            |
 
 ### Identity-based and resource-based policies
 
-| Policy type    | Question it answers                                  | Attached to                  |
-| -------------- | ---------------------------------------------------- | ---------------------------- |
-| Identity-based | What does a particular identity have access to?      | A user, group, or role       |
-| Resource-based | Who has access to a particular resource?             | A resource (for example, S3) |
+| Policy type    | Question it answers                             | Attached to                  |
+| -------------- | ----------------------------------------------- | ---------------------------- |
+| Identity-based | What does a particular identity have access to? | A user, group, or role       |
+| Resource-based | Who has access to a particular resource?        | A resource (for example, S3) |
 
 The difference between the two is **where they are applied**, which depends on the type of access you are authorizing or restricting.
 
@@ -136,3 +136,97 @@ The difference between the two is **where they are applied**, which depends on t
 **Inline policies** are embedded in a **single** principal entity, such as a user, group, or role.
 
 - Useful for a strict 1:1 relationship between a policy and the entity
+
+### Evaluation Logic for IAM Policies
+
+**Default:** all requests are **denied** unless there is an explicit **allow**.
+
+**Decision process** (all applicable policies are evaluated):
+
+1. Is there an explicit **DENY**? → Access **denied** (stop).
+2. Is there an explicit **ALLOW**? → Access **allowed**.
+3. No ALLOW found? → Access **denied** (implicit deny).
+
+> **Tip:** One DENY anywhere overrides all ALLOWs. DENY always wins.
+
+## Additional Authentication and Access Management Services
+
+### Identity Federation
+
+Identity federation lets people sign in to AWS using an identity they already have somewhere else, such as their company login, a Google account, or Microsoft Entra ID (formerly Azure AD). AWS does not store separate user names and passwords for them. It trusts the other system to say who they are.
+
+- **Identity provider (IdP):** Your on-premises system (for example, Active Directory) that authenticates users.
+- **Service provider (SP):** AWS, which trusts the IdP's authentication decisions.
+- **Result:** Employees use the same credentials for on-premises and AWS resources.
+
+### AWS Single Sign-On (AWS SSO)
+
+AWS SSO (now AWS IAM Identity Center) simplifies identity management across **multiple** AWS accounts and applications.
+
+- **Create identities once** in AWS SSO and access all accounts.
+- **Central management:** grant access to multiple accounts from one place.
+- **User portal:** single sign-on to all AWS accounts and business apps (Salesforce, Slack, GitHub, and so on).
+- **Supports:** Microsoft 365, on-premises AD, and custom identity stores.
+
+### AWS Directory Service / AWS Managed Microsoft AD
+
+AWS Directory Service lets you run AWS Managed Microsoft AD. Active Directory is the system many organizations use to store user accounts, computers, and group permissions, and to control who can log in to what.
+
+### Identity Federation vs. AWS Directory Service
+
+| Service | Focus |
+| --- | --- |
+| **AWS Directory Service** | Who users are and what they can access inside a Windows or AD-based environment. |
+| **IAM Identity Center** | Giving people access to AWS accounts and applications. |
+
+The two often work together: IAM Identity Center can use a Directory Service directory as its user source.
+
+### Amazon Cognito
+
+Amazon Cognito provides authentication and user management for mobile and web applications (it scales to millions of users).
+
+- **User pools (authentication):** sign-up and sign-in, MFA, and social login (Google, Facebook, Apple).
+- **Identity pools (authorization):** issue temporary AWS credentials to users for direct access to AWS services.
+
+## Using AWS Organizations
+
+### AWS Organizations
+
+AWS Organizations consolidates and manages multiple AWS accounts centrally.
+
+- **Consolidated billing:** one bill for all accounts, and volume discounts apply.
+- **Centralized creation:** create new accounts programmatically.
+- **Unified policies:** apply consistent security policies across the organization.
+
+### Organizational Units (OUs)
+
+- **Hierarchical:** organize accounts in a tree structure.
+- **Nested:** up to 5 levels deep.
+- **Isolated policies:** different OUs can have different policies.
+
+**Example structure:**
+
+```text
+Root
+├─ Production   (separate security policies)
+├─ Development  (relaxed restrictions)
+├─ Security     (restricted access)
+└─ Sandbox      (full access for testing)
+```
+
+### Service Control Policies (SCPs)
+
+SCPs enforce **maximum** permissions across the entire organization.
+
+- **Applied hierarchically:** parent OU policies affect all child OUs and accounts.
+- **Restrict only:** SCPs never grant permissions; they only set maximum boundaries.
+- **Evaluation:** both the Organizations SCP **and** the IAM policy must allow the action for access to be granted.
+
+**Common SCP use cases:**
+
+- Deny all EC2 use in dev accounts (cost control).
+- Deny `iam:*` to prevent privilege escalation.
+- Enforce encryption with approved KMS keys.
+- Prevent accounts from leaving the organization (deny `organizations:LeaveOrganization`).
+
+> **Exam tip:** SCP at the organization level + IAM policy at the account level = complete access control. Either one can say NO.
